@@ -34,7 +34,7 @@ public class SplashScreen extends Activity {
             ImageView imageView = findViewById(R.id.imageView);
             InputStream is = null;
             try {
-                is = getAssets().open("repertoar_logo.png");
+                is = getAssets().open("logo.jpg");
                 Drawable drawable = Drawable.createFromStream(is, null);
                 imageView.setImageDrawable(drawable);
             } catch (IOException e) {
