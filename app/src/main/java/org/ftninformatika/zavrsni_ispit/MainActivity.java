@@ -1,8 +1,16 @@
 package org.ftninformatika.zavrsni_ispit;
 
+import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,15 +20,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import org.ftninformatika.zavrsni_ispit.DB.DatabaseHelper;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import org.ftninformatika.zavrsni_ispit.DB.DatabaseHelper;
+import org.ftninformatika.zavrsni_ispit.DB.Filmovi;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        createNotificationChannel();
         fillData();
         setupToolbar();
         setupDrawer();
@@ -94,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     private void fillData() {
         drawerItems = new ArrayList<>();
         drawerItems.add("Pretraga filmova");
-        drawerItems.add("Pregled svih filmova");
+        drawerItems.add("Moji filmovi");
         drawerItems.add("Podesavanja");
         drawerItems.add("Obrisi sve");
 
@@ -118,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         pretragaFilmova();
                         break;
                     case 1:
-                        title = "Pregled svih filmova";
+                        title = "Moji filmovi";
 
                         break;
                     case 2:
@@ -129,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         title = "Obrisi sve";
+                        deleteFilmove();
                         break;
                     default:
                         break;
@@ -154,6 +170,51 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             }
         };
+
+    }
+
+
+    private void deleteFilmove() {
+        AlertDialog dialogDelete = new AlertDialog.Builder(this)
+                .setTitle("Brisanje nekretnine")
+                .setMessage("Da li zelite da obrisete sve filmove?")
+                .setPositiveButton("DA", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        try {
+                            List<Filmovi> filmovi =getDatabaseHelper().getFilmoviDao().queryForAll();
+
+                            getDatabaseHelper().getFilmoviDao().delete(filmovi);
+                            for (Filmovi f:filmovi) {
+                                getDatabaseHelper().getFilmoviDao().delete(f);
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        finish();
+                        boolean toast = prefs.getBoolean(getString(R.string.toast_key), false);
+                        boolean notif = prefs.getBoolean(getString(R.string.notif_key), false);
+
+                        if (toast) {
+                            Toast.makeText(MainActivity.this, "Izbrisani filmovi", Toast.LENGTH_LONG).show();
+
+                        }
+
+                        if (notif) {
+                            showNotification("Izbrisani filmovi");
+
+                        }
+
+
+                    }
+                })
+                .setNegativeButton("ODUSTANI", null)
+                .show();
+
+
 
     }
 
@@ -186,4 +247,56 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void showNotification(String poruka) {
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, NOTIF_CHANNEL_ID);
+        builder.setSmallIcon(android.R.drawable.ic_input_add);
+        builder.setContentTitle("Glumci");
+        builder.setContentText(poruka);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_reorder_black_24dp);
+
+
+        builder.setLargeIcon(bitmap);
+        notificationManager.notify(1, builder.build());
+    }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "My Channel";
+            String description = "Description of My Channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+        if (databaseHelper != null) {
+            OpenHelperManager.releaseHelper();
+            databaseHelper = null;
+        }
+
+    }
+
+    public DatabaseHelper getDatabaseHelper() {
+        if (databaseHelper == null) {
+            databaseHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+        }
+        return databaseHelper;
+    }
+
+    private void reset() {
+        imagePath = "";
+        preview = null;
+    }
 }
