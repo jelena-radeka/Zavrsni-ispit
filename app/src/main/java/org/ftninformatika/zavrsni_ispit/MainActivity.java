@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
@@ -33,6 +34,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.ftninformatika.zavrsni_ispit.DB.DatabaseHelper;
 import org.ftninformatika.zavrsni_ispit.DB.Filmovi;
+import org.ftninformatika.zavrsni_ispit.adapteri.AdapterMojiFilmovi;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -51,10 +53,10 @@ public class MainActivity extends AppCompatActivity {
     ListView drawerList;
     private RelativeLayout drawerPane;
     private ActionBarDrawerToggle drawerToggle;
-
+     AdapterMojiFilmovi adapterMojiFilmovi;
     private DatabaseHelper databaseHelper;
     private SharedPreferences prefs;
-
+    private TextView textView;
     public static String GLUMAC_KEY = "GLUMAC_KEY";
 
     private Toolbar toolbar;
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         title = "Obrisi sve";
-                        deleteFilmove();
+                        startActivity(new Intent(MainActivity.this, MojiFilmovi.class));
                         break;
                     default:
                         break;
@@ -175,49 +177,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void deleteFilmove() {
-        AlertDialog dialogDelete = new AlertDialog.Builder(this)
-                .setTitle("Brisanje nekretnine")
-                .setMessage("Da li zelite da obrisete sve filmove?")
-                .setPositiveButton("DA", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        try {
-                            List<Filmovi> filmovi =getDatabaseHelper().getFilmoviDao().queryForAll();
-
-                            getDatabaseHelper().getFilmoviDao().delete(filmovi);
-                            for (Filmovi f:filmovi) {
-                                getDatabaseHelper().getFilmoviDao().delete(f);
-                            }
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        finish();
-                        boolean toast = prefs.getBoolean(getString(R.string.toast_key), false);
-                        boolean notif = prefs.getBoolean(getString(R.string.notif_key), false);
-
-                        if (toast) {
-                            Toast.makeText(MainActivity.this, "Izbrisani filmovi", Toast.LENGTH_LONG).show();
-
-                        }
-
-                        if (notif) {
-                            showNotification("Izbrisani filmovi");
-
-                        }
-
-
-                    }
-                })
-                .setNegativeButton("ODUSTANI", null)
-                .show();
-
-
-
-    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -300,4 +259,8 @@ public class MainActivity extends AppCompatActivity {
         imagePath = "";
         preview = null;
     }
+
+
+
+
 }
