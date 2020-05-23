@@ -119,10 +119,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 1:
                         title = "Pregled svih filmova";
-                        //pretragaFilmova();
+
                         break;
                     case 2:
                         title = "Podesavanja";
+                        Intent settings = new Intent(MainActivity.this, Settings.class);
+                        startActivity(settings);
+
                         break;
                     case 3:
                         title = "Obrisi sve";

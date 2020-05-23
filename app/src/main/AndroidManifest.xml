@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PretragaActivity"></activity>
+        <activity android:name=".DetaljiActivity"></activity>
+        <activity android:name=".PretragaActivity" />
         <activity android:name=".Settings" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SplashScreen">

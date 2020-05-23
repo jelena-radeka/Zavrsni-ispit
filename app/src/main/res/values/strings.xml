@@ -4,4 +4,6 @@
     <string name="made_by">Jelena Radeka</string>
     <string name="toast_key">toast_key</string>
     <string name="notif_key">notif_key</string>
+    <string name="movie_name">Ime filma</string>
+    <string name="search">search</string>
 </resources>
