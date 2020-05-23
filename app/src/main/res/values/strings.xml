@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Zavrsni_ispit</string>
+    <string name="splash_key">splash_key</string>
+    <string name="made_by">Jelena Radeka</string>
 </resources>
