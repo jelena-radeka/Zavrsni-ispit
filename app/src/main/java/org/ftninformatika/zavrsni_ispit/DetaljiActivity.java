@@ -43,7 +43,7 @@ public class DetaljiActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalji);
 
-
+    setupToolbar();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 

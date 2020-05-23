@@ -134,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 1:
                         title = "Moji filmovi";
-
+                        startActivity(new Intent(MainActivity.this, MojiFilmovi.class));
                         break;
+
                     case 2:
                         title = "Podesavanja";
                         Intent settings = new Intent(MainActivity.this, Settings.class);
